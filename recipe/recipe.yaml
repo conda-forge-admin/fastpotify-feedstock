@@ -17,7 +17,9 @@ build:
       CARGO_PROFILE_RELEASE_LTO: fat
       CARGO_PROFILE_RELEASE_STRIP: symbols
     content:
-      - cargo auditable install --locked --no-track --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
+      - if: win
+        then: vcpkg install --triplet=x64-windows-static-md glew
+      - VCPKG_INSTALLATION_ROOT="$VCPKG_ROOT" cargo auditable install --locked --no-track --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
       - mkdir -p "$PREFIX/Menu"
       - cp "$RECIPE_DIR/menu.json" "$PREFIX/Menu/fastpotify.json"
       - if: linux
@@ -44,6 +46,8 @@ requirements:
       then:
         - make
         - pkg-config
+    - if: win
+      then: vcpkg
   host:
     - if: linux
       then:
