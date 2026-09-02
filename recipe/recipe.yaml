@@ -17,19 +17,23 @@ build:
       CARGO_PROFILE_RELEASE_LTO: fat
       CARGO_PROFILE_RELEASE_STRIP: symbols
     content:
+      - if: unix
+        then:
+          - cargo auditable install --locked --no-track --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
+          - mkdir -p "$PREFIX/Menu"
+          - cp "$RECIPE_DIR/menu.json" "$PREFIX/Menu/fastpotify.json"
       - if: win
-        then: vcpkg install --triplet=x64-windows-static-md glew
-      - VCPKG_INSTALLATION_ROOT="$VCPKG_ROOT" cargo auditable install --locked --no-track --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
-      - mkdir -p "$PREFIX/Menu"
-      - cp "$RECIPE_DIR/menu.json" "$PREFIX/Menu/fastpotify.json"
+        then:
+          - cargo auditable install --locked --no-track --no-default-features --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
+          - python -c "from pathlib import Path; Path('$PREFIX/Menu').mkdir(parents=True, exist_ok=True)"
+          - python -c "from shutil import copyfile; copyfile('$RECIPE_DIR/menu.json', '$PREFIX/Menu/fastpotify.json')"
+          - python -c "from shutil import copyfile; copyfile('$SRC_DIR/packaging/windows/fastpotify.ico', '$PREFIX/Menu/fastpotify.ico')"
       - if: linux
         then: cp packaging/macos/icon-1024.png "$PREFIX/Menu/fastpotify.png"
       - if: osx
         then:
           - bash packaging/macos/bundle.sh "$PREFIX/bin/fastpotify" Fastpotify.app "$PKG_VERSION"
           - cp Fastpotify.app/Contents/Resources/fastpotify.icns "$PREFIX/Menu/fastpotify.icns"
-      - if: win
-        then: cp packaging/windows/fastpotify.ico "$PREFIX/Menu/fastpotify.ico"
       - cargo-bundle-licenses --format yaml --output ./THIRDPARTY.yml
 
 requirements:
@@ -47,7 +51,7 @@ requirements:
         - make
         - pkg-config
     - if: win
-      then: vcpkg
+      then: python
   host:
     - if: linux
       then:
