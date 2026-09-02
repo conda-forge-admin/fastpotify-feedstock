@@ -25,9 +25,9 @@ build:
       - if: win
         then:
           - cargo auditable install --locked --no-track --no-default-features --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
-          - python -c "from pathlib import Path; Path('$PREFIX/Menu').mkdir(parents=True, exist_ok=True)"
-          - python -c "from shutil import copyfile; copyfile('$RECIPE_DIR/menu.json', '$PREFIX/Menu/fastpotify.json')"
-          - python -c "from shutil import copyfile; copyfile('$SRC_DIR/packaging/windows/fastpotify.ico', '$PREFIX/Menu/fastpotify.ico')"
+          - cmd /c mkdir "$PREFIX\\Menu"
+          - cmd /c copy /y "$RECIPE_DIR\\menu.json" "$PREFIX\\Menu\\fastpotify.json"
+          - cmd /c copy /y "$SRC_DIR\\packaging\\windows\\fastpotify.ico" "$PREFIX\\Menu\\fastpotify.ico"
       - if: linux
         then: cp packaging/macos/icon-1024.png "$PREFIX/Menu/fastpotify.png"
       - if: osx
@@ -50,8 +50,6 @@ requirements:
       then:
         - make
         - pkg-config
-    - if: win
-      then: python
   host:
     - if: linux
       then:
