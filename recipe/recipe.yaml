@@ -34,13 +34,16 @@ requirements:
   build:
     - ${{ stdlib('c') }}
     - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
     - ${{ compiler('rust') }}
     - cmake
     - brush
     - cargo-auditable
     - cargo-bundle-licenses
     - if: linux
-      then: pkg-config
+      then:
+        - make
+        - pkg-config
   host:
     - if: linux
       then:
