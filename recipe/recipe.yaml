@@ -19,7 +19,7 @@ build:
     content:
       - if: unix
         then:
-          - cargo auditable install --locked --no-track --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
+          - LIBCLANG_PATH="$BUILD_PREFIX/lib" cargo auditable install --locked --no-track --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
           - mkdir -p "$PREFIX/Menu"
           - cp "$RECIPE_DIR/menu.json" "$PREFIX/Menu/fastpotify.json"
       - if: win
@@ -46,6 +46,8 @@ requirements:
     - brush
     - cargo-auditable
     - cargo-bundle-licenses
+    - if: unix
+      then: libclang
     - if: linux
       then:
         - make
