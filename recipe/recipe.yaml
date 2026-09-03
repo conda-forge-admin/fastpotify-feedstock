@@ -17,6 +17,8 @@ build:
       CARGO_PROFILE_RELEASE_LTO: fat
       CARGO_PROFILE_RELEASE_STRIP: symbols
     content:
+      - if: linux
+        then: export BINDGEN_EXTRA_CLANG_ARGS="--sysroot=$CONDA_BUILD_SYSROOT"
       - if: unix
         then:
           - LIBCLANG_PATH="$BUILD_PREFIX/lib" cargo auditable install --locked --no-track --bins --root "${LIBRARY_PREFIX:-$PREFIX}" --path .
@@ -50,12 +52,14 @@ requirements:
       then: libclang
     - if: linux
       then:
+        - clangdev
         - make
         - pkg-config
   host:
     - if: linux
       then:
         - alsa-lib
+        - libgl-devel
         - libxkbcommon
         - pulseaudio-client
         - wayland
@@ -64,7 +68,6 @@ requirements:
   run:
     - if: linux
       then:
-        - libgl
         - xorg-libxcursor
         - xorg-libxi
         - xorg-libxrandr
